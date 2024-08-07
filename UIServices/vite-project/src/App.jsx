@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import './App.css';
 import Login from './Views/Login.jsx';
 import Dashboard from './Views/DashBoard.jsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
