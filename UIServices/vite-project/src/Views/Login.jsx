@@ -7,6 +7,8 @@ import Modal from '../Component/Modal';  // Import the Modal component
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [regEmail, setRegEmail] = useState('');
+    const [regpassword, setRegPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [showModal, setShowModal] = useState(false);
@@ -27,6 +29,23 @@ const Login = () => {
             setSuccess('');
         }
     };
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        try {
+            console.log(regEmail, regpassword);
+            const response = await axios.post('http://localhost:3000/auth/auth/register', { regEmail, regpassword });
+            console.log('Success'); 
+            setError('');
+            // navigate('/dashboard');
+            // Store the token or handle the successful login response here
+            console.log(response.data);
+        } catch (error) {
+            setError('Login failed. Please check your email and password.');
+            setSuccess('');
+        }
+    };
+
+
 
     const handleRegisterClick = () => {
         setShowModal(true);
@@ -81,13 +100,13 @@ const Login = () => {
                 <form>
                     <div className="input-group">
                         <label htmlFor="reg-email">Email</label>
-                        <input type="email" id="reg-email" name="reg-email" required />
+                        <input type="email" onChange={(e) => setRegEmail(e.target.value)} id="reg-email"value={regEmail} name="reg-email" required />
                     </div>
                     <div className="input-group">
                         <label htmlFor="reg-password">Password</label>
-                        <input type="password" id="reg-password" name="reg-password" required />
+                        <input type="password" id="reg-password" onChange={(e) => setRegPassword(e.target.value)} value={regpassword} name="reg-password" required />
                     </div>
-                    <button type="submit" className="register-button">Register</button>
+                    <button type="submit" onClick={handleRegister} className="register-button">Register</button>
                 </form>
             </Modal>
         </div>
