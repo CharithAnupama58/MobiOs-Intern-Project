@@ -5,6 +5,8 @@ import imageBox from '../assets/images/imageBox.png';
 const UploadCsv = () => {
     const [dragging, setDragging] = useState(false);
     const [files, setFiles] = useState([]);
+    const [uploadData, setUploadData] = useState(null);
+    const [showPopup, setShowPopup] = useState(false); 
 
     const handleDragOver = (e) => {
         e.preventDefault();
@@ -27,25 +29,27 @@ const UploadCsv = () => {
         if (files.length === 4) {
             const formData = new FormData();
             files.forEach(file => formData.append('csvFiles', file));
-            console.log('Files being sent:', files);
-            for (let [key, value] of formData.entries()) {
-                console.log(key, value);
-            }
 
             try {
-                const response = await axios.post('http://localhost:3000/nicValidation//nicRoutes/upload-csv', formData, {
+                const response = await axios.post('http://localhost:3000/nicValidation/nicRoutes/upload-csv', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
                 
-                console.log(response.data);
+                setUploadData(response.data.data); 
+                setShowPopup(true); 
+                setFiles('');
             } catch (error) {
                 console.error('Error uploading files:', error);
             }
         } else {
             alert('Please upload exactly 4 CSV files.');
         }
+    };
+
+    const closePopup = () => {
+        setShowPopup(false);
     };
 
     return (
@@ -90,6 +94,33 @@ const UploadCsv = () => {
                             <li key={index} className='text-xl'>{file.name}</li>
                         ))}
                     </ul>
+                </div>
+            )}
+
+            {showPopup && (
+                <div className='fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center'>
+                    <div className='bg-white p-6 rounded-lg w-1/2'>
+                        <h2 className='text-3xl font-semibold mb-4'>Uploaded NIC Details</h2>
+                        <div className='overflow-auto max-h-96'>
+                            <ul>
+                                {uploadData && uploadData.map((item, index) => (
+                                    <li key={index} className='mb-4'>
+                                        <p className='text-xl'>NIC: {item.NIC}</p>
+                                        <p>Birthday: {item.Birthday}</p>
+                                        <p>Age: {item.Age}</p>
+                                        <p>Gender: {item.Gender}</p>
+                                        <p>File Name: {item.file_name}</p>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <button
+                            className='mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600'
+                            onClick={closePopup}
+                        >
+                            Close
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
