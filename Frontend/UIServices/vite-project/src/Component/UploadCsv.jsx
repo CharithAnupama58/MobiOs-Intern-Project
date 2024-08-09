@@ -5,7 +5,7 @@ import imageBox from '../assets/images/imageBox.png';
 const UploadCsv = () => {
     const [dragging, setDragging] = useState(false);
     const [files, setFiles] = useState([]);
-    const [uploadData, setUploadData] = useState(null);
+    const [uploadData, setUploadData] = useState(null); 
     const [showPopup, setShowPopup] = useState(false); 
 
     const handleDragOver = (e) => {
@@ -16,17 +16,17 @@ const UploadCsv = () => {
     const handleDrop = (e) => {
         e.preventDefault();
         setDragging(false);
-        const droppedFiles = Array.from(e.dataTransfer.files).slice(0, 4);
+        const droppedFiles = Array.from(e.dataTransfer.files);
         setFiles(droppedFiles);
     };
 
     const handleFileUpload = (e) => {
-        const uploadedFiles = Array.from(e.target.files).slice(0, 4);
+        const uploadedFiles = Array.from(e.target.files);
         setFiles(uploadedFiles);
     };
 
     const handleNextClick = async () => {
-        if (files.length === 4) {
+        if (files.length >= 4) {  // Adjusted to allow 4 or more files
             const formData = new FormData();
             files.forEach(file => formData.append('csvFiles', file));
 
@@ -39,12 +39,11 @@ const UploadCsv = () => {
                 
                 setUploadData(response.data.data); 
                 setShowPopup(true); 
-                setFiles('');
             } catch (error) {
                 console.error('Error uploading files:', error);
             }
         } else {
-            alert('Please upload exactly 4 CSV files.');
+            alert('Please upload at least 4 CSV files.');
         }
     };
 
@@ -67,7 +66,7 @@ const UploadCsv = () => {
                 {dragging ? (
                     <p className='text-4xl font-semibold ml-24 mt-16'>Drop the files here</p>
                 ) : (
-                    <p className='text-4xl font-semibold ml-24 mt-14'>Drag and drop up to 4 files here</p>
+                    <p className='text-4xl font-semibold ml-24 mt-14'>Drag and drop your files here</p>
                 )}
             </div>
             <h1 className='text-2xl font-semibold'>Or</h1>
@@ -81,7 +80,7 @@ const UploadCsv = () => {
                 <button
                     className='bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600'
                     onClick={handleNextClick}
-                    disabled={files.length !== 4}
+                    disabled={files.length < 4}  // Ensure at least 4 files are selected
                 >
                     Next
                 </button>

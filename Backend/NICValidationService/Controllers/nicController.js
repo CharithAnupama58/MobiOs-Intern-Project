@@ -1,10 +1,10 @@
 import fs from 'fs';
 import csvParser from 'csv-parser';
-import  db  from '../model/db.js'; 
+import db from '../model/db.js'; 
 
 export const uploadCsvFiles = async (req, res) => {
-    if (!req.files || req.files.length !== 4) {
-        return res.status(400).json({ error: 'Please upload exactly 4 CSV files.' });
+    if (!req.files || req.files.length < 4) {
+        return res.status(400).json({ error: 'Please upload at least 4 CSV files.' });
     }
 
     const results = [];
@@ -13,6 +13,17 @@ export const uploadCsvFiles = async (req, res) => {
         const fileResults = await processCsvFile(file.path, file.originalname);
         results.push(...fileResults);
     }
+
+    // After processing, delete the uploaded files
+    req.files.forEach(file => {
+        fs.unlink(file.path, (err) => {
+            if (err) {
+                console.error(`Failed to delete file ${file.path}:`, err);
+            } else {
+                console.log(`Successfully deleted file ${file.path}`);
+            }
+        });
+    });
 
     res.json({ message: 'NICs validated and saved successfully', data: results });
 };
@@ -47,7 +58,6 @@ const validateNic = (nic) => {
     let birthYear, birthMonth, birthDay, gender;
 
     if (nic.length === 10) {
-        
         birthYear = parseInt(`19${nic.substring(0, 2)}`);
         const days = parseInt(nic.substring(2, 5));
         gender = days > 500 ? 'Female' : 'Male';
