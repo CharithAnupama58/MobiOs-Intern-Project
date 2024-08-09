@@ -14,17 +14,6 @@ export const uploadCsvFiles = async (req, res) => {
         results.push(...fileResults);
     }
 
-    // After processing, delete the uploaded files
-    req.files.forEach(file => {
-        fs.unlink(file.path, (err) => {
-            if (err) {
-                console.error(`Failed to delete file ${file.path}:`, err);
-            } else {
-                console.log(`Successfully deleted file ${file.path}`);
-            }
-        });
-    });
-
     res.json({ message: 'NICs validated and saved successfully', data: results });
 };
 

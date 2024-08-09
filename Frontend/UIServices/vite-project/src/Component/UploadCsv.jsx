@@ -26,7 +26,7 @@ const UploadCsv = () => {
     };
 
     const handleNextClick = async () => {
-        if (files.length >= 4) {  // Adjusted to allow 4 or more files
+        if (files.length >= 4) { 
             const formData = new FormData();
             files.forEach(file => formData.append('csvFiles', file));
 
@@ -39,6 +39,7 @@ const UploadCsv = () => {
                 
                 setUploadData(response.data.data); 
                 setShowPopup(true); 
+                setFiles([]);
             } catch (error) {
                 console.error('Error uploading files:', error);
             }
@@ -80,7 +81,7 @@ const UploadCsv = () => {
                 <button
                     className='bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600'
                     onClick={handleNextClick}
-                    disabled={files.length < 4}  // Ensure at least 4 files are selected
+                    disabled={files.length < 4}  
                 >
                     Next
                 </button>
