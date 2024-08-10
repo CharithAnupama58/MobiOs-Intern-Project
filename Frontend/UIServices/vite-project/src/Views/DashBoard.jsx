@@ -1,21 +1,15 @@
 import { useState, useEffect } from 'react';
 import image1 from '../assets/images/id-card-1024x768-removebg-preview.png';
 import UploadCsv from '../Component/UploadCsv';
+import AllRecords from '../Component/AllRecords'
 import { useNavigate } from 'react-router-dom';
 
-const BranchEmployee = () => {
-    const [dateTime, setDateTime] = useState(new Date());
+const Dashboard = () => {
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
     const [selectedInterface, setSelectedInterface] = useState('UploadCsv');
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setDateTime(new Date());
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, []);
+    
 
     const handleLogout = () => {
         setShowLogoutPopup(true);
@@ -35,42 +29,42 @@ const BranchEmployee = () => {
     };
 
     return (
-        <section className='flex flex-col h-screen'>
-            <div className="flex flex-row flex-grow">
-                <div className="flex flex-col w-72 bg-custom-green items-center bg-slate-500">
-                    <div className='flex-row'>
-                        <img src={image1} alt="logo" className='w-100 h-50' />
-                        <h1 className='text-white font-bold text-2xl -mt-6 ml-4'>NIC Validation System</h1>
+        <section className="flex flex-col h-screen">
+            <div className="flex flex-col md:flex-row flex-grow">
+                <div className="flex flex-col w-full md:w-72 bg-custom-green items-center bg-slate-500 p-4">
+                    <div className='flex-row text-center mb-8'>
+                        <img src={image1} alt="logo" className='w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 mx-auto' />
+                        <h1 className='text-white font-bold text-xl md:text-2xl mt-2'>NIC Validation System</h1>
                     </div>
-                    <div className='flex flex-col w-72 justify-center items-center mb-32 mt-12'>
-                        <button className={`w-56 h-12 bg-white items-center mb-4 rounded-xl`}>
-                            <div className='flex w-56 h-12 bg-white items-center justify-around mb-4 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('UploadCsv')}>
-                                <h1 className='font-bold text-xl'>Upload Csv's</h1>
+                    <div className='flex flex-col w-full justify-center items-center mb-12 md:mb-32 mt-4'>
+                        <button className="w-full md:w-56 h-12 bg-white items-center mb-4 rounded-xl">
+                            <div className='flex w-full h-12 bg-white items-center justify-around mb-4 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('UploadCsv')}>
+                                <h1 className='font-bold text-lg md:text-xl'>Upload Csv's</h1>
                             </div>
                         </button>
-                        <button className={`w-56 h-12 bg-white items-center justify-around mb-4 rounded-xl`}>
-                            <div className='flex w-56 h-12 bg-white items-center justify-around mb-3 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('releaseOrders')}>
-                                <h1 className='font-bold text-xl'>All Records</h1>
+                        <button className="w-full md:w-56 h-12 bg-white items-center justify-around mb-4 rounded-xl">
+                            <div className='flex w-full h-12 bg-white items-center justify-around mb-3 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('allRecords')}>
+                                <h1 className='font-bold text-lg md:text-xl'>All Records</h1>
                             </div>
                         </button>
-                        <button className={`w-56 h-12 bg-white items-center justify-around mb-4 rounded-xl`}>
-                            <div className='flex w-56 h-12 bg-white items-center justify-around mb-3 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('dashboard')}>
-                                <h1 className='font-bold text-xl'>Dashboard</h1>
+                        <button className="w-full md:w-56 h-12 bg-white items-center justify-around mb-4 rounded-xl">
+                            <div className='flex w-full h-12 bg-white items-center justify-around mb-3 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('dashboard')}>
+                                <h1 className='font-bold text-lg md:text-xl'>Dashboard</h1>
                             </div>
                         </button>
-                        <button className={`w-56 h-12 bg-white items-center justify-around mb-4 rounded-xl`}>
-                            <div className='flex w-56 h-12 bg-white items-center justify-around mb-3 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('reports')}>
-                                <h1 className='font-bold text-xl'>Reports</h1>
+                        <button className="w-full md:w-56 h-12 bg-white items-center justify-around mb-4 rounded-xl">
+                            <div className='flex w-full h-12 bg-white items-center justify-around mb-3 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('reports')}>
+                                <h1 className='font-bold text-lg md:text-xl'>Reports</h1>
                             </div>
                         </button>
                     </div>
-                    <div className='flex w-56 h-12 bg-white items-center justify-around border-2 border-black rounded-xl hover:bg-gray-400'>
-                        <button className='font-bold text-2xl' onClick={handleLogout}>Logout</button>
+                    <div className='flex w-full md:w-56 h-12 bg-white items-center justify-around border-2 border-black rounded-xl hover:bg-gray-400'>
+                        <button className='font-bold text-lg md:text-2xl' onClick={handleLogout}>Logout</button>
                     </div>
                 </div>
-                <div className="flex flex-col items-center justify-center text-black flex-grow">
+                <div className="flex flex-col items-center justify-center text-black flex-grow p-4">
                     {selectedInterface === 'UploadCsv' && <UploadCsv />}
-                    {selectedInterface === 'releaseOrders' && <div>Release Orders Content</div>}
+                    {selectedInterface === 'allRecords' && <AllRecords/>}
                     {selectedInterface === 'dashboard' && <div>Dashboard Content</div>}
                     {selectedInterface === 'reports' && <div>Reports Content</div>}
                 </div>
@@ -91,4 +85,4 @@ const BranchEmployee = () => {
     );
 };
 
-export default BranchEmployee;
+export default Dashboard;

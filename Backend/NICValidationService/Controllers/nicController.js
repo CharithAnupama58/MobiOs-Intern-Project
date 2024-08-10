@@ -1,6 +1,7 @@
 import fs from 'fs';
 import csvParser from 'csv-parser';
 import db from '../model/db.js'; 
+import { Console } from 'console';
 
 export const uploadCsvFiles = async (req, res) => {
     if (!req.files || req.files.length < 4) {
@@ -105,4 +106,27 @@ const saveNicDataToDatabase = (nicData) => {
             console.log('NIC data saved to the database:', result.insertId);
         }
     });
+};
+
+export const getNicDetails = async (req, res) => {
+    console.log('meka wada')
+    try {
+        const items = await new Promise((resolve, reject) => {
+            db.query('SELECT * FROM nic_data', (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(results);
+                }
+            });
+        });
+        if (items.length > 0) {
+            return res.status(200).json({ items });
+        } else {
+            return res.status(404).json({ error: 'No items found' });
+        }
+    } catch (error) {
+        console.log('Error fetching items:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
 };
