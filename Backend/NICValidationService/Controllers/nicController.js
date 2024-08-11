@@ -1,7 +1,7 @@
 import fs from 'fs';
 import csvParser from 'csv-parser';
 import db from '../model/db.js'; 
-import { Console } from 'console';
+
 
 export const uploadCsvFiles = async (req, res) => {
     if (!req.files || req.files.length < 4) {
@@ -109,17 +109,10 @@ const saveNicDataToDatabase = (nicData) => {
 };
 
 export const getNicDetails = async (req, res) => {
-    console.log('meka wada')
+    console.log('meka wada');
     try {
-        const items = await new Promise((resolve, reject) => {
-            db.query('SELECT * FROM nic_data', (error, results) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(results);
-                }
-            });
-        });
+        const [items] = await db.query('SELECT * FROM nic_data');
+        
         if (items.length > 0) {
             return res.status(200).json({ items });
         } else {
@@ -129,4 +122,42 @@ export const getNicDetails = async (req, res) => {
         console.log('Error fetching items:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
+};
+export const getNicChartDetails = async (req, res) => {
+    try {
+        const [totalRecordsResult] = await db.query('SELECT COUNT(*) as totalRecords FROM nic_data');
+        const totalRecords = totalRecordsResult[0].totalRecords;
+        const [maleCountResult] = await db.query('SELECT COUNT(*) as maleCount FROM nic_data WHERE gender = "Male"');
+        const maleCount = maleCountResult[0].maleCount;
+        const [femaleCountResult] = await db.query('SELECT COUNT(*) as femaleCount FROM nic_data WHERE gender = "Female"');
+        const femaleCount = femaleCountResult[0].femaleCount;
+        res.json({
+            totalRecords,
+            maleCount,
+            femaleCount,
+        });
+    } catch (error) {
+        console.error('Error fetching NIC data stats:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+export const getReportsDetails = async (req, res) => {
+    console.log('meka wada');
+    console.log(req.body);
+    const {filter} =req.body;
+    console.log(filter);
+    // try {
+        
+    //     const [items] = await db.query('SELECT * FROM nic_data');
+        
+    //     if (items.length > 0) {
+    //         return res.status(200).json({ items });
+    //     } else {
+    //         return res.status(404).json({ error: 'No items found' });
+    //     }
+    // } catch (error) {
+    //     console.log('Error fetching items:', error);
+    //     return res.status(500).json({ error: 'Internal Server Error' });
+    // }
 };

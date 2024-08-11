@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import image1 from '../assets/images/id-card-1024x768-removebg-preview.png';
 import UploadCsv from '../Component/UploadCsv';
-import AllRecords from '../Component/AllRecords'
+import AllRecords from '../Component/AllRecords';
+import ChartsInterface from '../Component/Charts';
+import Reports from '../Component/Reports';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
@@ -62,11 +64,11 @@ const Dashboard = () => {
                         <button className='font-bold text-lg md:text-2xl' onClick={handleLogout}>Logout</button>
                     </div>
                 </div>
-                <div className="flex flex-col items-center justify-center text-black flex-grow p-4">
+                <div className="flex flex-col items-center justify-center text-black flex-grow">
                     {selectedInterface === 'UploadCsv' && <UploadCsv />}
                     {selectedInterface === 'allRecords' && <AllRecords/>}
-                    {selectedInterface === 'dashboard' && <div>Dashboard Content</div>}
-                    {selectedInterface === 'reports' && <div>Reports Content</div>}
+                    {selectedInterface === 'dashboard' && <ChartsInterface/>}
+                    {selectedInterface === 'reports' && <Reports/>}
                 </div>
             </div>
 

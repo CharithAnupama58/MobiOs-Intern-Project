@@ -53,7 +53,7 @@ const UploadCsv = () => {
     };
 
     return (
-        <div className="flex flex-col items-center w-full h-full justify-evenly p-4 md:p-8">
+        <div className="flex flex-col items-center w-full h-full justify-evenly p-4 md:p-8 bg-gray-100">
             <div className="flex items-center justify-center mb-4 md:mb-6">
                 <h1 className="text-3xl md:text-6xl font-bold text-center">Upload CSV Files</h1>
             </div>

@@ -32,7 +32,7 @@ const Login = () => {
         e.preventDefault();
         try {
             console.log(regEmail, regPassword);
-            const response = await axios.post('http://localhost:3000/auth/auth/register', { email: regEmail, password: regPassword });
+            const response = await axios.post('http://localhost:3000/auth/auth/register', { regEmail, regPassword });
             console.log('Registration successful');
             setError('');
             setSuccess('Registration successful');

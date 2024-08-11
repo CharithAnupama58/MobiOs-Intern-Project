@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-// import 'jspdf-autotable';
 
 const AllRecords = () => {
     const [items, setItems] = useState([]);
@@ -23,9 +22,11 @@ const AllRecords = () => {
         setSearchQuery(e.target.value);
     };
 
-   
-
-    
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        const date = new Date(dateString);
+        return date.toLocaleDateString(undefined, options); // You can specify 'en-US' for MM/DD/YYYY or 'en-GB' for DD/MM/YYYY
+    };
 
     const filteredItems = items.filter(item =>
         (typeof item.id === 'string' && item.id.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -37,12 +38,12 @@ const AllRecords = () => {
     );
 
     return (
-        <div className='flex flex-row w-full justify-center'>
+        <div className='flex flex-row w-full h-full justify-center bg-gray-100'>
             <div className='flex flex-col items-center'>
                 <h1 className='mt-10 font-bold text-4xl'>All NIC Numbers</h1>
                 <div>
                     <label className="font-semibold text-xl">Search Anything:</label>
-                    <input type="text" className=" ml-4 border border-gray-400 px-4 py-0 mt-10 rounded-xl" placeholder="Search" onChange={handleSearch} />
+                    <input type="text" className="ml-4 border border-gray-400 px-4 py-0 mt-10 rounded-xl" placeholder="Search" onChange={handleSearch} />
                 </div>
                 <div className="w-full max-h-96 overflow-y-auto">
                     <table className="table-auto border border-collapse border-gray-400 mt-10" id='stockTable'>
@@ -59,19 +60,18 @@ const AllRecords = () => {
                         <tbody className='flex-row justify-center items-center'>
                             {filteredItems.map((item, index) => (
                                 <tr key={index}>
-                                    <td className="px-4  text-center border-r border-gray-400">{item.id}</td>
-                                    <td className="px-4  text-center border-r border-gray-400">{item.nic}</td>
-                                    <td className="px-4  text-center border-r border-gray-400">{item.birthday}</td>
-                                    <td className="px-4  text-center border-r border-gray-400">{item.age}</td>
-                                    <td className="px-4  text-center border-r border-gray-400">{item.gender}</td>
-                                    <td className="px-4  text-center border-r border-gray-400">{item.file_name}</td>
+                                    <td className="px-4 text-center border-r border-gray-400">{item.id}</td>
+                                    <td className="px-4 text-center border-r border-gray-400">{item.nic}</td>
+                                    <td className="px-4 text-center border-r border-gray-400">{formatDate(item.birthday)}</td>
+                                    <td className="px-4 text-center border-r border-gray-400">{item.age}</td>
+                                    <td className="px-4 text-center border-r border-gray-400">{item.gender}</td>
+                                    <td className="px-4 text-center border-r border-gray-400">{item.file_name}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             </div>
-
         </div>
     );
 };
