@@ -46,9 +46,9 @@ const AllRecords = () => {
                     <input type="text" className="ml-4 border border-gray-400 px-4 py-0 mt-10 rounded-xl" placeholder="Search" onChange={handleSearch} />
                 </div>
                 <div className="w-full max-h-96 overflow-y-auto">
-                    <table className="table-auto border border-collapse border-gray-400 mt-10" id='stockTable'>
+                    <table className="table-auto border  border-gray-400 mt-10" id='stockTable'>
                         <thead>
-                            <tr>
+                            <tr className='bg-gray-300'>
                                 <th className="border border-gray-400 px-10 py-2">ID</th>
                                 <th className="border border-gray-400 px-10 py-2">Nic</th>
                                 <th className="border border-gray-400 px-12 py-2">Birthday</th>

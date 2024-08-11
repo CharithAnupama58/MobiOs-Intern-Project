@@ -144,20 +144,43 @@ export const getNicChartDetails = async (req, res) => {
 
 export const getReportsDetails = async (req, res) => {
     console.log('meka wada');
-    console.log(req.body);
-    const {filter} =req.body;
-    console.log(filter);
-    // try {
-        
-    //     const [items] = await db.query('SELECT * FROM nic_data');
-        
-    //     if (items.length > 0) {
-    //         return res.status(200).json({ items });
-    //     } else {
-    //         return res.status(404).json({ error: 'No items found' });
-    //     }
-    // } catch (error) {
-    //     console.log('Error fetching items:', error);
-    //     return res.status(500).json({ error: 'Internal Server Error' });
-    // }
+    console.log(req.query.filter);
+    const {filter} =req.query;
+    if(filter === 'all'){
+        try {
+            const [items] = await db.query('SELECT * FROM nic_data');
+            if (items.length > 0) {
+                return res.status(200).json({ items });
+            } else {
+                return res.status(404).json({ error: 'No items found' });
+            }
+        } catch (error) {
+            console.log('Error fetching items:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }else if(filter === 'male'){
+        try {
+            const [items] = await db.query('SELECT * FROM nic_data WHERE gender = "Male"' );
+            if (items.length > 0) {
+                return res.status(200).json({ items });
+            } else {
+                return res.status(404).json({ error: 'No items found' });
+            }
+        } catch (error) {
+            console.log('Error fetching items:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }else if(filter === 'female'){
+        try {
+            const [items] = await db.query('SELECT * FROM nic_data WHERE gender = "Female"' );
+            if (items.length > 0) {
+                return res.status(200).json({ items });
+            } else {
+                return res.status(404).json({ error: 'No items found' });
+            }
+        } catch (error) {
+            console.log('Error fetching items:', error);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
 };
