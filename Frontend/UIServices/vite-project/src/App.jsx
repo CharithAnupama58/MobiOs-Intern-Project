@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './App.css';
 import Login from './Views/Login.jsx';
 import Dashboard from './Views/DashBoard.jsx';
+import ProtectedRoute from './Component/ProtectedRoutes.jsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 const router = createBrowserRouter([
@@ -11,7 +12,7 @@ const router = createBrowserRouter([
   },
   {
     path:'/dashboard',
-    element: <Dashboard />
+    element: <ProtectedRoute element={<Dashboard />} />
   }
 ]);
 

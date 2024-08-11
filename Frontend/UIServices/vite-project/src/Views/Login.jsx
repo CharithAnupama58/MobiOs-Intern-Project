@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Modal from '../Component/Modal'; // Import the Modal component
+import Modal from '../Component/Modal'; 
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -13,20 +13,28 @@ const Login = () => {
     const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        localStorage.removeItem('jwtToken');
+    }, []);
+   
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            console.log(email, password);
             const response = await axios.post('http://localhost:3000/auth/auth/login', { email, password });
+            const { token } = response.data;
+            console.log(token);
+            localStorage.setItem('jwtToken', token);
+    
             setSuccess('Login successful');
             setError('');
             navigate('/dashboard');
-            console.log(response.data);
         } catch (error) {
             setError('Login failed. Please check your email and password.');
             setSuccess('');
         }
     };
+    
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -54,7 +62,7 @@ const Login = () => {
     return (
         <div className="flex flex-col justify-center items-center min-h-screen bg-cover bg-center" style={{ backgroundImage: 'url(https://wallpaper-house.com/data/out/6/wallpaper2you_115490.jpg)' }}>
             <div className="mb-8 text-center">
-                <h2 className="text-3xl text-white shadow-md">Welcome to NIC Validation System</h2>
+                <h2 className="text-4xl text-white shadow-md">Welcome to NIC Validation System</h2>
             </div>
             <div className="w-full max-w-sm p-8 bg-white bg-opacity-50 rounded-lg shadow-md">
                 <h1 className="text-2xl font-bold mb-6 text-gray-800">Login</h1>
