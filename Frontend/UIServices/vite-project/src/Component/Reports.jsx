@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import 'jspdf-autotable';
 import image from '../assets/images/id-card-1024x768-removebg-preview.png';
 
 const Reports = () => {
@@ -27,58 +27,83 @@ const Reports = () => {
     const handleFilterChange = (event) => {
         setFilter(event.target.value);
     };
-
-    const handleDownload = () => {
-        const input = document.getElementById('table-to-pdf');
+    const addTemplate = (doc, title, pageNumber, totalPages) => {
+        const pageWidth = doc.internal.pageSize.width;
+        const pageHeight = doc.internal.pageSize.height;
     
-        html2canvas(input).then((canvas) => {
-            const imgWidth = 200; 
-            const pageHeight = 200; 
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            let heightLeft = imgHeight;
-            let position = 3;
+       
+        const fontSize = 16;
+        doc.setFontSize(fontSize);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 102, 204); 
     
-            let reportTitle = '';
-            if (filter === 'all') {
-                reportTitle = 'NIC Data Report - All Users';
-            } else if (filter === 'male') {
-                reportTitle = 'NIC Data Report - Male Users';
-            } else if (filter === 'female') {
-                reportTitle = 'NIC Data Report - Female Users';
-            }
+        
+        const textWidth = doc.getStringUnitWidth(title) * fontSize / doc.internal.scaleFactor;
+        const xPos = (pageWidth - textWidth) / 2;
+        const yPos = 10; 
+        doc.text(title, xPos, yPos);
     
-           
-            pdf.setFontSize(18);
-            pdf.text(reportTitle, 10, 20);
-            position = 30;
+       
+        const logoWidth = 30;
+        const logoHeight = 30;
+        const logoXPos = (pageWidth - logoWidth) / 2;
+        const logoYPos = yPos + 10; 
+        doc.addImage(image, 'PNG', logoXPos, logoYPos, logoWidth, logoHeight);
     
-            
-            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, pageHeight);
-            heightLeft -= pageHeight;
+        
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(0, 0, 0); 
+        const footerText = `Page ${pageNumber} of ${totalPages}`;
+        const footerYPos = pageHeight - 10;
+        doc.text(footerText, pageWidth / 2, footerYPos, { align: 'center' });
     
-            while (heightLeft > 0) {
-                position = heightLeft - pageHeight;
-                const pageCanvas = document.createElement('canvas');
-                pageCanvas.width = canvas.width;
-                pageCanvas.height = canvas.height - pageHeight;
-    
-                const ctx = pageCanvas.getContext('2d');
-                ctx.drawImage(canvas, 0, -position);
-    
-                const imgData = pageCanvas.toDataURL('image/png');
-    
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, pageHeight);
-                heightLeft -= pageHeight;
-            }
-    
-            pdf.save('reports.pdf');
-        });
+        
+        doc.setDrawColor(0, 102, 204); 
+        doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
     };
     
+    const handleDownload = () => {
+        const doc = new jsPDF();
+        let title = '';
+            if (filter === 'all') {
+                title = 'NIC Data Report - All Users';
+            } else if (filter === 'male') {
+                title = 'NIC Data Report - Male Users';
+            } else if (filter === 'female') {
+                title = 'NIC Data Report - Female Users';
+            }
     
+        
+        const table = document.getElementById('table-to-pdf');
+        doc.autoTable({
+            html: table,
+            startY: 60, 
+            didDrawPage: function (data) {
+                const pageNumber = doc.internal.getNumberOfPages();
+                const totalPages = doc.internal.getNumberOfPages();
     
+                addTemplate(doc, title, pageNumber, totalPages);
+            },
+            styles: {
+                fillColor: [255, 255, 255],
+                textColor: [0, 0, 0], 
+                lineColor: [0, 102, 204], 
+                lineWidth: 0.1,
+            },
+            headStyles: {
+                fillColor: [0, 102, 204],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+            },
+            alternateRowStyles: {
+                fillColor: [240, 240, 240], 
+            },
+        });
+    
+        doc.save('nic_report.pdf');
+    };
+
 
     return (
         <div className="flex flex-col items-center w-full h-full bg-gray-100">
