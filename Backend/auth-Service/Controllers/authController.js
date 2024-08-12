@@ -8,7 +8,7 @@ export const register = async (req, res) => {
     try {
         
         const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [regEmail]);
-        console.log(rowa[0]);
+        console.log(rows[0]);
         if (rows.length > 0) {
             return res.status(400).json({ message: 'User already exists' });
         }

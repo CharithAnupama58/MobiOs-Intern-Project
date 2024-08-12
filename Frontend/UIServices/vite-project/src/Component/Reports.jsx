@@ -32,12 +32,12 @@ const Reports = () => {
         const input = document.getElementById('table-to-pdf');
     
         html2canvas(input).then((canvas) => {
-            const imgWidth = 210; 
-            const pageHeight = 297; 
+            const imgWidth = 200; 
+            const pageHeight = 200; 
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
             const pdf = new jsPDF('p', 'mm', 'a4');
             let heightLeft = imgHeight;
-            let position = 0;
+            let position = 3;
     
             let reportTitle = '';
             if (filter === 'all') {

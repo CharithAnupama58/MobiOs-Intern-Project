@@ -2,6 +2,8 @@ import React, { useState,useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../Component/Modal'; 
+import Swal from 'sweetalert2';
+
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -26,12 +28,24 @@ const Login = () => {
             console.log(token);
             localStorage.setItem('jwtToken', token);
     
-            setSuccess('Login successful');
+            Swal.fire({
+                title: 'Success!',
+                text: 'Login successful!',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
             setError('');
             navigate('/dashboard');
         } catch (error) {
-            setError('Login failed. Please check your email and password.');
+            Swal.fire({
+                title: 'Warning!',
+                text: 'Login Failed!',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+
             setSuccess('');
+            cleareTexts();
         }
     };
     
@@ -42,17 +56,33 @@ const Login = () => {
             console.log(regEmail, regPassword);
             const response = await axios.post('http://localhost:3000/auth/auth/register', { regEmail, regPassword });
             console.log('Registration successful');
-            setError('');
-            setSuccess('Registration successful');
+            Swal.fire({
+                title: 'Success!',
+                text: 'Registration successful!',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+            setRegEmail('');
+            setRegPassword('');
             console.log(response.data);
         } catch (error) {
-            setError('Registration failed. Please check your email and password.');
+            Swal.fire({
+                title: 'Warning!',
+                text: 'Login Failed!',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+            setRegEmail('');
             setSuccess('');
         }
     };
 
     const handleRegisterClick = () => {
         setShowModal(true);
+    };
+    const cleareTexts = () => {
+        setEmail('');
+        setPassword('');
     };
 
     const handleCloseModal = () => {
@@ -96,7 +126,7 @@ const Login = () => {
                     <button type="submit" className="w-full p-2 bg-green-600 text-white font-bold rounded hover:bg-green-700">Login</button>
                 </form>
                 <div className="mt-4 text-center">
-                    <button className="text-blue-600 hover:underline" onClick={handleRegisterClick}>Register</button>
+                    <button className="w-full p-2 bg-slate-600 text-white font-bold rounded hover:bg-slate-700" onClick={handleRegisterClick}>Register</button>
                 </div>
             </div>
             <Modal show={showModal} handleClose={handleCloseModal}>
