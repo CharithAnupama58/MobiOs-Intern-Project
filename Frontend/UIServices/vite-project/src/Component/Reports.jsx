@@ -27,6 +27,11 @@ const Reports = () => {
     const handleFilterChange = (event) => {
         setFilter(event.target.value);
     };
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        const date = new Date(dateString);
+        return date.toLocaleDateString(undefined, options);
+    };
     const addTemplate = (doc, title, pageNumber, totalPages) => {
         const pageWidth = doc.internal.pageSize.width;
         const pageHeight = doc.internal.pageSize.height;
@@ -136,7 +141,7 @@ const Reports = () => {
                                 <td className="border p-4">{item.id}</td>
                                 <td className="border p-4">{item.nic}</td>
                                 <td className="border p-4">{item.gender}</td>
-                                <td className="border p-4">{item.birthday}</td>
+                                <td className="border p-4">{formatDate(item.birthday)}</td>
                                 <td className="border p-4">{item.age}</td>
                                 <td className="border p-4">{item.file_name}</td>
                             </tr>

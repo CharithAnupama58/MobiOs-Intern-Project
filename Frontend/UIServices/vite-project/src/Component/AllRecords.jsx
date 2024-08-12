@@ -25,7 +25,7 @@ const AllRecords = () => {
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
         const date = new Date(dateString);
-        return date.toLocaleDateString(undefined, options); // You can specify 'en-US' for MM/DD/YYYY or 'en-GB' for DD/MM/YYYY
+        return date.toLocaleDateString(undefined, options); 
     };
 
     const filteredItems = items.filter(item =>
