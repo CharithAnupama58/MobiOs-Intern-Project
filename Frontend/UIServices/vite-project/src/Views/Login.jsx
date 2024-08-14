@@ -1,24 +1,24 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../Component/Modal'; 
 import Swal from 'sweetalert2';
-
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [regEmail, setRegEmail] = useState('');
     const [regPassword, setRegPassword] = useState('');
+    const [resetEmail, setResetEmail] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const [showResetModal, setShowResetModal] = useState(false); // New state for reset modal
     const navigate = useNavigate();
 
     useEffect(() => {
         localStorage.removeItem('jwtToken');
     }, []);
-   
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,7 +27,7 @@ const Login = () => {
             const { token } = response.data;
             console.log(token);
             localStorage.setItem('jwtToken', token);
-    
+
             Swal.fire({
                 title: 'Success!',
                 text: 'Login successful!',
@@ -48,7 +48,6 @@ const Login = () => {
             cleareTexts();
         }
     };
-    
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -68,7 +67,7 @@ const Login = () => {
         } catch (error) {
             Swal.fire({
                 title: 'Warning!',
-                text: 'Login Failed!',
+                text: 'Registration Failed!',
                 icon: 'warning',
                 confirmButtonText: 'OK'
             });
@@ -77,16 +76,47 @@ const Login = () => {
         }
     };
 
+    const handleForgotPassword = async (e) => {
+        e.preventDefault();
+        try {
+            await axios.post('http://localhost:3000/auth/auth/forgot-password', { email: resetEmail });
+            Swal.fire({
+                title: 'Success!',
+                text: 'Password reset link sent!',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+            setResetEmail('');
+            setShowResetModal(false);
+        } catch (error) {
+            Swal.fire({
+                title: 'Warning!',
+                text: 'Failed to send reset link!',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+            setResetEmail('');
+        }
+    };
+
     const handleRegisterClick = () => {
         setShowModal(true);
     };
-    const cleareTexts = () => {
-        setEmail('');
-        setPassword('');
+
+    const handleForgotPasswordClick = () => {
+        setShowResetModal(true);
     };
 
     const handleCloseModal = () => {
         setShowModal(false);
+    };
+
+    const handleCloseResetModal = () => {
+        setShowResetModal(false);
+    };
+    const cleareTexts = () => {
+        setEmail('');
+        setPassword('');
     };
 
     return (
@@ -128,7 +158,11 @@ const Login = () => {
                 <div className="mt-4 text-center">
                     <button className="w-full p-2 bg-slate-600 text-white font-bold rounded hover:bg-slate-700" onClick={handleRegisterClick}>Register</button>
                 </div>
+                <div className="mt-4 text-center">
+                    <button className="text-blue-600 hover:underline" onClick={handleForgotPasswordClick}>Forgot Password?</button>
+                </div>
             </div>
+
             <Modal show={showModal} handleClose={handleCloseModal}>
                 <h2 className="text-2xl font-bold mb-4">Register</h2>
                 <form onSubmit={handleRegister} className="space-y-4">
@@ -157,6 +191,25 @@ const Login = () => {
                         />
                     </div>
                     <button type="submit" className="w-full p-2 bg-blue-600 text-white font-bold rounded hover:bg-blue-700">Register</button>
+                </form>
+            </Modal>
+
+            <Modal show={showResetModal} handleClose={handleCloseResetModal}>
+                <h2 className="text-2xl font-bold mb-4">Reset Password</h2>
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                    <div className="flex flex-col">
+                        <label htmlFor="reset-email" className="mb-1 font-medium text-gray-700">Email</label>
+                        <input 
+                            type="email" 
+                            id="reset-email" 
+                            name="reset-email" 
+                            value={resetEmail} 
+                            onChange={(e) => setResetEmail(e.target.value)} 
+                            className="p-2 border border-gray-300 rounded" 
+                            required 
+                        />
+                    </div>
+                    <button type="submit"  className="w-full p-2 bg-blue-600 text-white font-bold rounded hover:bg-blue-700">Send Reset Link</button>
                 </form>
             </Modal>
         </div>
