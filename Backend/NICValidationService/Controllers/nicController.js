@@ -109,12 +109,21 @@ const saveNicDataToDatabase = (nicData) => {
 };
 
 export const getNicDetails = async (req, res) => {
-    console.log('meka wada');
     try {
-        const [items] = await db.query('SELECT * FROM nic_data');
-        
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const offset = (page - 1) * limit;
+
+        const [items] = await db.query('SELECT * FROM nic_data LIMIT ? OFFSET ?', [limit, offset]);
+        const [[{ totalItems }]] = await db.query('SELECT COUNT(*) as totalItems FROM nic_data');
+
         if (items.length > 0) {
-            return res.status(200).json({ items });
+            return res.status(200).json({
+                items,
+                totalItems,
+                totalPages: Math.ceil(totalItems / limit),
+                currentPage: page
+            });
         } else {
             return res.status(404).json({ error: 'No items found' });
         }
@@ -123,6 +132,7 @@ export const getNicDetails = async (req, res) => {
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
 export const getNicChartDetails = async (req, res) => {
     try {
         const [totalRecordsResult] = await db.query('SELECT COUNT(*) as totalRecords FROM nic_data');
@@ -143,44 +153,46 @@ export const getNicChartDetails = async (req, res) => {
 };
 
 export const getReportsDetails = async (req, res) => {
-    console.log('meka wada');
-    console.log(req.query.filter);
-    const {filter} =req.query;
-    if(filter === 'all'){
-        try {
-            const [items] = await db.query('SELECT * FROM nic_data');
-            if (items.length > 0) {
-                return res.status(200).json({ items });
-            } else {
-                return res.status(404).json({ error: 'No items found' });
-            }
-        } catch (error) {
-            console.log('Error fetching items:', error);
-            return res.status(500).json({ error: 'Internal Server Error' });
+    const { filter = 'all', page = 1, limit = 10 } = req.query;
+
+    
+    const offset = (page - 1) * limit;
+
+    try {
+        let query = '';
+        let queryParams = [];
+
+    
+        if (filter === 'all') {
+            query = 'SELECT * FROM nic_data LIMIT ? OFFSET ?';
+            queryParams = [parseInt(limit), parseInt(offset)];
+        } else if (filter === 'male') {
+            query = 'SELECT * FROM nic_data WHERE gender = "Male" LIMIT ? OFFSET ?';
+            queryParams = [parseInt(limit), parseInt(offset)];
+        } else if (filter === 'female') {
+            query = 'SELECT * FROM nic_data WHERE gender = "Female" LIMIT ? OFFSET ?';
+            queryParams = [parseInt(limit), parseInt(offset)];
         }
-    }else if(filter === 'male'){
-        try {
-            const [items] = await db.query('SELECT * FROM nic_data WHERE gender = "Male"' );
-            if (items.length > 0) {
-                return res.status(200).json({ items });
-            } else {
-                return res.status(404).json({ error: 'No items found' });
-            }
-        } catch (error) {
-            console.log('Error fetching items:', error);
-            return res.status(500).json({ error: 'Internal Server Error' });
+
+        const [items] = await db.query(query, queryParams);
+
+        let countQuery = '';
+        if (filter === 'all') {
+            countQuery = 'SELECT COUNT(*) as count FROM nic_data';
+        } else {
+            countQuery = `SELECT COUNT(*) as count FROM nic_data WHERE gender = "${filter.charAt(0).toUpperCase() + filter.slice(1)}"`;
         }
-    }else if(filter === 'female'){
-        try {
-            const [items] = await db.query('SELECT * FROM nic_data WHERE gender = "Female"' );
-            if (items.length > 0) {
-                return res.status(200).json({ items });
-            } else {
-                return res.status(404).json({ error: 'No items found' });
-            }
-        } catch (error) {
-            console.log('Error fetching items:', error);
-            return res.status(500).json({ error: 'Internal Server Error' });
+        const [countResult] = await db.query(countQuery);
+        const totalItems = countResult[0].count;
+        const totalPages = Math.ceil(totalItems / limit);
+
+        if (items.length > 0) {
+            return res.status(200).json({ items, totalItems, totalPages, currentPage: parseInt(page) });
+        } else {
+            return res.status(404).json({ error: 'No items found' });
         }
+    } catch (error) {
+        console.log('Error fetching items:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
 };

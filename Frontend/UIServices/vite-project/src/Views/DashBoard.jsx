@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import image1 from '../assets/images/id-card-1024x768-removebg-preview.png';
 import UploadCsv from '../Component/UploadCsv';
 import AllRecords from '../Component/AllRecords';
 import ChartsInterface from '../Component/Charts';
 import Reports from '../Component/Reports';
 import { useNavigate } from 'react-router-dom';
+import { FaBars, FaTimes } from 'react-icons/fa'; // Import icons for hamburger
 
 const Dashboard = () => {
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
     const [selectedInterface, setSelectedInterface] = useState('UploadCsv');
+    const [isMenuOpen, setIsMenuOpen] = useState(false); // State to handle menu toggle
     const navigate = useNavigate();
-
-    
 
     const handleLogout = () => {
         setShowLogoutPopup(true);
@@ -28,47 +28,64 @@ const Dashboard = () => {
 
     const handleInterfaceChange = (interfaceName) => {
         setSelectedInterface(interfaceName);
+        setIsMenuOpen(false); // Close menu after selection in mobile view
+    };
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
     };
 
     return (
         <section className="flex flex-col h-screen">
             <div className="flex flex-col md:flex-row flex-grow">
-                <div className="flex flex-col w-full md:w-72 bg-custom-green items-center bg-slate-500 p-4">
-                    <div className='flex-row text-center mb-8'>
-                        <img src={image1} alt="logo" className='w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 mx-auto' />
-                        <h1 className='text-white font-bold text-xl md:text-2xl mt-2'>NIC Validation System</h1>
-                    </div>
-                    <div className='flex flex-col w-full justify-center items-center mb-12 md:mb-32 mt-4'>
-                        <button className="w-full md:w-56 h-12 bg-white items-center mb-4 rounded-xl">
-                            <div className='flex w-full h-12 bg-white items-center justify-around mb-4 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('UploadCsv')}>
-                                <h1 className='font-bold text-lg md:text-xl'>Upload Csv's</h1>
-                            </div>
-                        </button>
-                        <button className="w-full md:w-56 h-12 bg-white items-center justify-around mb-4 rounded-xl">
-                            <div className='flex w-full h-12 bg-white items-center justify-around mb-3 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('allRecords')}>
-                                <h1 className='font-bold text-lg md:text-xl'>All Records</h1>
-                            </div>
-                        </button>
-                        <button className="w-full md:w-56 h-12 bg-white items-center justify-around mb-4 rounded-xl">
-                            <div className='flex w-full h-12 bg-white items-center justify-around mb-3 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('dashboard')}>
-                                <h1 className='font-bold text-lg md:text-xl'>Dashboard</h1>
-                            </div>
-                        </button>
-                        <button className="w-full md:w-56 h-12 bg-white items-center justify-around mb-4 rounded-xl">
-                            <div className='flex w-full h-12 bg-white items-center justify-around mb-3 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('reports')}>
-                                <h1 className='font-bold text-lg md:text-xl'>Reports</h1>
-                            </div>
+                <div className="flex flex-col w-full md:w-72 bg-custom-green bg-slate-500 p-4">
+                    {/* Hamburger Menu Icon for Mobile View */}
+                    <div className="md:hidden flex justify-between items-center mb-4">
+                        <img src={image1} alt="logo" className='w-16 h-16' />
+                        <button onClick={toggleMenu} className="text-white text-3xl">
+                            {isMenuOpen ? <FaTimes /> : <FaBars />}
                         </button>
                     </div>
-                    <div className='flex w-full md:w-56 h-12 bg-white items-center justify-around border-2 border-black rounded-xl hover:bg-gray-400'>
-                        <button className='font-bold text-lg md:text-2xl' onClick={handleLogout}>Logout</button>
+
+                    {/* Sidebar Menu */}
+                    <div className={`flex-col w-full items-center ${isMenuOpen ? 'block' : 'hidden'} md:flex`}>
+                        <div className='flex-row text-center mb-8'>
+                            <img src={image1} alt="logo" className='w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 mx-auto hidden md:block' />
+                            <h1 className='text-white font-bold text-xl md:text-2xl mt-2'>NIC Validation System</h1>
+                        </div>
+                        <div className='flex flex-col w-full justify-center items-center mb-12 md:mb-32 mt-4'>
+                            <button className="w-full md:w-56 h-12 bg-white items-center mb-4 rounded-xl">
+                                <div className='flex w-full h-12 bg-white items-center justify-around mb-4 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('UploadCsv')}>
+                                    <h1 className='font-bold text-lg md:text-xl'>Upload Csv's</h1>
+                                </div>
+                            </button>
+                            <button className="w-full md:w-56 h-12 bg-white items-center justify-around mb-4 rounded-xl">
+                                <div className='flex w-full h-12 bg-white items-center justify-around mb-3 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('allRecords')}>
+                                    <h1 className='font-bold text-lg md:text-xl'>All Records</h1>
+                                </div>
+                            </button>
+                            <button className="w-full md:w-56 h-12 bg-white items-center justify-around mb-4 rounded-xl">
+                                <div className='flex w-full h-12 bg-white items-center justify-around mb-3 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('dashboard')}>
+                                    <h1 className='font-bold text-lg md:text-xl'>Dashboard</h1>
+                                </div>
+                            </button>
+                            <button className="w-full md:w-56 h-12 bg-white items-center justify-around mb-4 rounded-xl">
+                                <div className='flex w-full h-12 bg-white items-center justify-around mb-3 border-2 border-black rounded-xl hover:bg-gray-400' onClick={() => handleInterfaceChange('reports')}>
+                                    <h1 className='font-bold text-lg md:text-xl'>Reports</h1>
+                                </div>
+                            </button>
+                        </div>
+                        <div className='flex w-full md:w-56 h-12 bg-white items-center justify-around border-2 border-black rounded-xl hover:bg-gray-400'>
+                            <button className='font-bold text-lg md:text-2xl' onClick={handleLogout}>Logout</button>
+                        </div>
                     </div>
                 </div>
+
                 <div className="flex flex-col items-center justify-center text-black flex-grow">
                     {selectedInterface === 'UploadCsv' && <UploadCsv />}
-                    {selectedInterface === 'allRecords' && <AllRecords/>}
-                    {selectedInterface === 'dashboard' && <ChartsInterface/>}
-                    {selectedInterface === 'reports' && <Reports/>}
+                    {selectedInterface === 'allRecords' && <AllRecords />}
+                    {selectedInterface === 'dashboard' && <ChartsInterface />}
+                    {selectedInterface === 'reports' && <Reports />}
                 </div>
             </div>
 
