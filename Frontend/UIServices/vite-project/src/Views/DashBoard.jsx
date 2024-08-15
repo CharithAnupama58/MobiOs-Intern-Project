@@ -28,7 +28,7 @@ const Dashboard = () => {
 
     const handleInterfaceChange = (interfaceName) => {
         setSelectedInterface(interfaceName);
-        setIsMenuOpen(false); // Close menu after selection in mobile view
+        setIsMenuOpen(false); 
     };
 
     const toggleMenu = () => {
@@ -39,7 +39,7 @@ const Dashboard = () => {
         <section className="flex flex-col h-screen">
             <div className="flex flex-col md:flex-row flex-grow">
                 <div className="flex flex-col w-full md:w-72 bg-custom-green bg-slate-500 p-4">
-                    {/* Hamburger Menu Icon for Mobile View */}
+                    
                     <div className="md:hidden flex justify-between items-center mb-4">
                         <img src={image1} alt="logo" className='w-16 h-16' />
                         <button onClick={toggleMenu} className="text-white text-3xl">
@@ -47,7 +47,6 @@ const Dashboard = () => {
                         </button>
                     </div>
 
-                    {/* Sidebar Menu */}
                     <div className={`flex-col w-full items-center ${isMenuOpen ? 'block' : 'hidden'} md:flex`}>
                         <div className='flex-row text-center mb-8'>
                             <img src={image1} alt="logo" className='w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 mx-auto hidden md:block' />

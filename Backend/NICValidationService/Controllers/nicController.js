@@ -104,19 +104,33 @@ const isValidDate = (year, month, day) => {
 const saveNicDataToDatabase = (nicData) => {
     const { NIC, Birthday, Age, Gender, file_name } = nicData;
 
-    const query = `
-        INSERT INTO nic_data (nic, birthday, age, gender, file_name)
-        VALUES (?, ?, ?, ?, ?)
-    `;
-
-    db.query(query, [NIC, Birthday, Age, Gender, file_name], (err, result) => {
+    const checkQuery = 'SELECT COUNT(*) AS count FROM nic_data WHERE nic = ?';
+    db.query(checkQuery, [NIC], (err, results) => {
         if (err) {
-            console.error('Error saving NIC data to the database:', err);
-        } else {
-            console.log('NIC data saved to the database:', result.insertId);
+            console.error('Error checking NIC existence:', err);
+            return;
         }
+
+        if (results[0].count > 0) {
+            console.log('NIC number already exists in the database:', NIC);
+            return;
+        }
+
+       
+        const insertQuery = `
+            INSERT INTO nic_data (nic, birthday, age, gender, file_name)
+            VALUES (?, ?, ?, ?, ?)`;
+
+        db.query(insertQuery, [NIC, Birthday, Age, Gender, file_name], (err, result) => {
+            if (err) {
+                console.error('Error saving NIC data to the database:', err);
+            } else {
+                console.log('NIC data saved to the database:', result.insertId);
+            }
+        });
     });
 };
+
 
 export const getNicDetails = async (req, res) => {
     try {
