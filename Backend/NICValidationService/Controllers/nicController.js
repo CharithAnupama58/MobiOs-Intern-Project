@@ -54,6 +54,8 @@ const validateNic = (nic) => {
         const adjustedDays = gender === 'Female' ? days - 500 : days;
 
         const birthDate = getDateFromDays(adjustedDays, birthYear);
+        if (!isValidDate(birthYear, birthDate.month, birthDate.day)) return null;
+
         birthMonth = birthDate.month;
         birthDay = birthDate.day;
     } else if (nic.length === 12) {
@@ -63,6 +65,8 @@ const validateNic = (nic) => {
         const adjustedDays = gender === 'Female' ? days - 500 : days;
 
         const birthDate = getDateFromDays(adjustedDays, birthYear);
+        if (!isValidDate(birthYear, birthDate.month, birthDate.day)) return null;
+
         birthMonth = birthDate.month;
         birthDay = birthDate.day;
     } else {
@@ -79,17 +83,23 @@ const validateNic = (nic) => {
     };
 };
 
+
 const getDateFromDays = (days, year) => {
-    const months = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    let month = 0;
-
-    while (days > months[month]) {
-        days -= months[month];
-        month++;
-    }
-
-    return { day: days, month: month + 1 };
+    const date = new Date(year, 0); 
+    date.setDate(days);
+    return { month: date.getMonth() + 1, day: date.getDate() };
 };
+
+
+const isValidDate = (year, month, day) => {
+    const date = new Date(year, month - 1, day);
+    return (
+        date.getFullYear() === year &&
+        date.getMonth() + 1 === month &&
+        date.getDate() === day
+    );
+};
+
 
 const saveNicDataToDatabase = (nicData) => {
     const { NIC, Birthday, Age, Gender, file_name } = nicData;
