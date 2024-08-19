@@ -3,24 +3,14 @@ import csvParser from 'csv-parser';
 import db from '../model/db.js'; 
 
 
-export const uploadCsvFiles = async (req, res) => {
-    if (!req.files || req.files.length < 4) {
-        return res.status(400).json({ error: 'Please upload at least 4 CSV files.' });
-    }
 
-    const results = [];
-
-    for (let file of req.files) {
-        const fileResults = await processCsvFile(file.path, file.originalname);
-        results.push(...fileResults);
-    }
-
-    res.json({ message: 'NICs validated and saved successfully', data: results });
-};
 
 const processCsvFile = (filePath, fileName) => {
     return new Promise((resolve, reject) => {
-        const results = [];
+        const validResults = [];
+        const invalidResults = [];
+        let maleCount = 0;
+        let femaleCount = 0;
 
         fs.createReadStream(filePath)
             .pipe(csvParser())
@@ -28,19 +18,55 @@ const processCsvFile = (filePath, fileName) => {
                 const nic = row['NIC'];
                 const nicData = validateNic(nic);
                 if (nicData) {
-                    nicData.file_name = fileName; 
+                    nicData.file_name = fileName;
                     saveNicDataToDatabase(nicData);
-                    results.push(nicData);
+                    validResults.push(nicData);
+
+                    // Count male and female NICs
+                    if (nicData.Gender === 'Male') {
+                        maleCount++;
+                    } else if (nicData.Gender === 'Female') {
+                        femaleCount++;
+                    }
+                } else {
+                    invalidResults.push({ NIC: nic, file_name: fileName });
                 }
             })
             .on('end', () => {
-                resolve(results);
+                resolve({ validResults, invalidResults, maleCount, femaleCount });
             })
             .on('error', (error) => {
                 reject(error);
             });
     });
 };
+
+export const uploadCsvFiles = async (req, res) => {
+    if (!req.files || req.files.length < 4) {
+        return res.status(400).json({ error: 'Please upload at least 4 CSV files.' });
+    }
+
+    const results = {
+        valid: [],
+        invalid: [],
+        maleCount: 0,
+        femaleCount: 0,
+    };
+
+    for (let file of req.files) {
+        const fileResults = await processCsvFile(file.path, file.originalname);
+        results.valid.push(...fileResults.validResults);
+        results.invalid.push(...fileResults.invalidResults);
+        results.maleCount += fileResults.maleCount;
+        results.femaleCount += fileResults.femaleCount;
+    }
+
+    res.json({
+        message: 'NICs validated and saved successfully',
+        data: results,
+    });
+};
+
 
 const validateNic = (nic) => {
     if (!nic) return null;
@@ -99,36 +125,45 @@ const isValidDate = (year, month, day) => {
         date.getDate() === day
     );
 };
+const checkNicExists = async (nic) => {
+    const [rows] = await db.query('SELECT COUNT(*) AS count FROM nic_data WHERE nic = ?', [nic]);
+    return rows[0].count > 0;
+};
 
 
-const saveNicDataToDatabase = (nicData) => {
+const saveNicDataToDatabase = async(nicData) => {
     const { NIC, Birthday, Age, Gender, file_name } = nicData;
 
-    const checkQuery = 'SELECT COUNT(*) AS count FROM nic_data WHERE nic = ?';
-    db.query(checkQuery, [NIC], (err, results) => {
-        if (err) {
-            console.error('Error checking NIC existence:', err);
-            return;
-        }
+    const exists = await checkNicExists( NIC);
+    if (exists) {
+        console.log('NIC number already exists in the database:', NIC);
+        // Rollback the transaction and exit
+        // await connection.rollback();
+        return;
+    }
 
-        if (results[0].count > 0) {
-            console.log('NIC number already exists in the database:', NIC);
-            return;
-        }
+    // Insert NIC data
+    await db.query(
+        'INSERT INTO nic_data (nic, birthday, age, gender, file_name) VALUES (?, ?, ?, ?, ?)',
+        [NIC, Birthday, Age, Gender, file_name]
+    );
+
+    // Commit the transaction
+    // await connection.commit();
+    console.log('NIC data saved to the database.');
 
        
-        const insertQuery = `
-            INSERT INTO nic_data (nic, birthday, age, gender, file_name)
-            VALUES (?, ?, ?, ?, ?)`;
+        // const insertQuery = `
+        //     INSERT INTO nic_data (nic, birthday, age, gender, file_name)
+        //     VALUES (?, ?, ?, ?, ?)`;
 
-        db.query(insertQuery, [NIC, Birthday, Age, Gender, file_name], (err, result) => {
-            if (err) {
-                console.error('Error saving NIC data to the database:', err);
-            } else {
-                console.log('NIC data saved to the database:', result.insertId);
-            }
-        });
-    });
+        // db.query(insertQuery, [NIC, Birthday, Age, Gender, file_name], (err, result) => {
+        //     if (err) {
+        //         console.error('Error saving NIC data to the database:', err);
+        //     } else {
+        //         console.log('NIC data saved to the database:', result.insertId);
+        //     }
+        // });
 };
 
 

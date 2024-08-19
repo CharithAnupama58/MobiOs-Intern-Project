@@ -5,12 +5,12 @@ import AllRecords from '../Component/AllRecords';
 import ChartsInterface from '../Component/Charts';
 import Reports from '../Component/Reports';
 import { useNavigate } from 'react-router-dom';
-import { FaBars, FaTimes } from 'react-icons/fa'; // Import icons for hamburger
+import { FaBars, FaTimes } from 'react-icons/fa'; 
 
 const Dashboard = () => {
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
     const [selectedInterface, setSelectedInterface] = useState('UploadCsv');
-    const [isMenuOpen, setIsMenuOpen] = useState(false); // State to handle menu toggle
+    const [isMenuOpen, setIsMenuOpen] = useState(false); 
     const navigate = useNavigate();
 
     const handleLogout = () => {

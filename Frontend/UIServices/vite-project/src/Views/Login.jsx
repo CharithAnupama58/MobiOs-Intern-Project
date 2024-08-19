@@ -13,7 +13,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [showModal, setShowModal] = useState(false);
-    const [showResetModal, setShowResetModal] = useState(false); // New state for reset modal
+    const [showResetModal, setShowResetModal] = useState(false); 
     const navigate = useNavigate();
 
     useEffect(() => {
