@@ -22,7 +22,6 @@ const processCsvFile = (filePath, fileName) => {
                     saveNicDataToDatabase(nicData);
                     validResults.push(nicData);
 
-                    // Count male and female NICs
                     if (nicData.Gender === 'Male') {
                         maleCount++;
                     } else if (nicData.Gender === 'Female') {
@@ -72,26 +71,38 @@ const validateNic = (nic) => {
     if (!nic) return null;
 
     let birthYear, birthMonth, birthDay, gender;
+    const nicLength = nic.length;
+    
+    if (nicLength === 10) {
+        const nicLastChar = nic.charAt(nicLength - 1).toUpperCase();
+        if (nicLastChar !== 'V' && nicLastChar !== 'X') return "Invalid Character NIC number";
 
-    if (nic.length === 10) {
         birthYear = parseInt(`19${nic.substring(0, 2)}`);
         const days = parseInt(nic.substring(2, 5));
+        if (days < 1 || days > 866) return "Invalid Days";
+
         gender = days > 500 ? 'Female' : 'Male';
         const adjustedDays = gender === 'Female' ? days - 500 : days;
 
+        if (adjustedDays < 1 || adjustedDays > 366) return "Invalid Days";
+
         const birthDate = getDateFromDays(adjustedDays, birthYear);
-        if (!isValidDate(birthYear, birthDate.month, birthDate.day)) return null;
+        if (!isValidDate(birthYear, birthDate.month, birthDate.day)) return "Invalid Date";
 
         birthMonth = birthDate.month;
         birthDay = birthDate.day;
-    } else if (nic.length === 12) {
+    } else if (nicLength === 12) {
         birthYear = parseInt(nic.substring(0, 4));
         const days = parseInt(nic.substring(4, 7));
+
+
         gender = days > 500 ? 'Female' : 'Male';
         const adjustedDays = gender === 'Female' ? days - 500 : days;
 
+        if (adjustedDays < 1 || adjustedDays > 366) return "Invalid Days";
+
         const birthDate = getDateFromDays(adjustedDays, birthYear);
-        if (!isValidDate(birthYear, birthDate.month, birthDate.day)) return null;
+        if (!isValidDate(birthYear, birthDate.month, birthDate.day)) return "Invalid Date";
 
         birthMonth = birthDate.month;
         birthDay = birthDate.day;
@@ -101,6 +112,8 @@ const validateNic = (nic) => {
 
     const age = new Date().getFullYear() - birthYear;
 
+    if (age < 16) return null;
+
     return {
         NIC: nic,
         Birthday: `${birthYear}-${birthMonth}-${birthDay}`,
@@ -109,13 +122,11 @@ const validateNic = (nic) => {
     };
 };
 
-
 const getDateFromDays = (days, year) => {
     const date = new Date(year, 0); 
     date.setDate(days);
     return { month: date.getMonth() + 1, day: date.getDate() };
 };
-
 
 const isValidDate = (year, month, day) => {
     const date = new Date(year, month - 1, day);
@@ -125,6 +136,7 @@ const isValidDate = (year, month, day) => {
         date.getDate() === day
     );
 };
+
 const checkNicExists = async (nic) => {
     const [rows] = await db.query('SELECT COUNT(*) AS count FROM nic_data WHERE nic = ?', [nic]);
     return rows[0].count > 0;
@@ -137,19 +149,14 @@ const saveNicDataToDatabase = async(nicData) => {
     const exists = await checkNicExists( NIC);
     if (exists) {
         console.log('NIC number already exists in the database:', NIC);
-        // Rollback the transaction and exit
-        // await connection.rollback();
         return;
     }
 
-    // Insert NIC data
     await db.query(
         'INSERT INTO nic_data (nic, birthday, age, gender, file_name) VALUES (?, ?, ?, ?, ?)',
         [NIC, Birthday, Age, Gender, file_name]
     );
 
-    // Commit the transaction
-    // await connection.commit();
     console.log('NIC data saved to the database.');
 
        
